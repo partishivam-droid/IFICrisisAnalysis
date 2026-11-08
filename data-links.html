@@ -1,0 +1,23 @@
+<style>
+  .data-downloads { margin-top: 1.5rem; font-size: 0.875rem; }
+  .data-downloads h2 { font-size: 0.875rem; font-weight: 400; margin: 0 0 0.5rem; border: 0; padding: 0; }
+  .data-downloads ul { list-style: none; padding-left: 0; margin: 0; }
+  .data-downloads li { margin-bottom: 0.35rem; }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var toc = document.getElementById("TOC");
+  if (!toc) return;
+  var box = document.createElement("div");
+  box.className = "data-downloads";
+  box.innerHTML =
+    '<h2>Data</h2><ul>' +
+    '<li><a href="data/01_cpi.csv" download>CPI inflation (CSV)</a></li>' +
+    '<li><a href="data/02_budget_deficit.csv" download>Budget balance (CSV)</a></li>' +
+    '<li><a href="data/03_fx_reserves.csv" download>FX reserves (CSV)</a></li>' +
+    '<li><a href="data/04_gdp_growth.csv" download>GDP growth (CSV)</a></li>' +
+    '<li><a href="data/05_exchange_rate.csv" download>Exchange rate (CSV)</a></li>' +
+    '</ul>';
+  toc.insertAdjacentElement("afterend", box);
+});
+</script>

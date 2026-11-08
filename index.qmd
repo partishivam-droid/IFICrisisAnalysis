@@ -1,0 +1,417 @@
+---
+title: "Israel's 1983–1985 Inflation Crisis"
+author: "Shivam Parti"
+date: today
+format:
+  html:
+    include-after-body: data-links.html
+    fig-width: 9
+    fig-height: 4.8
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup-all-charts
+#| include: false
+
+library(tidyverse)
+library(plotly)
+library(lubridate)
+library(scales)
+
+# ---- Common time window: every chart runs 1972-1995 --------------------
+start_date <- as.Date("1972-01-01")
+end_date   <- as.Date("1995-12-31")
+start_year <- 1972
+end_year   <- 1995
+
+# ---- Load data ---------------------------------------------------------
+
+# 1. CPI inflation (quarterly, % change vs. same quarter prior year)
+df_cpi <- read_csv("data/01_cpi.csv", show_col_types = FALSE) %>%
+  rename(observation_date = 1, inflation = 2) %>%
+  mutate(observation_date = mdy(observation_date)) %>%
+  filter(observation_date >= start_date)
+
+# 2. Budget balance (annual, % of GDP; negative = deficit)
+df_deficit <- read_csv("data/02_budget_deficit.csv", show_col_types = FALSE) %>%
+  filter(year >= start_year) %>%
+  mutate(type = if_else(deficit_gdp < 0, "Deficit", "Surplus"))
+
+# 3. FX reserves excluding gold (annual, current US$)
+df_reserves <- read_csv("data/03_fx_reserves.csv", show_col_types = FALSE) %>%
+  filter(year >= start_year) %>%
+  mutate(reserves_bn = reserves_usd / 1e9)
+
+# 4. Real GDP growth (annual, %)
+df_gdp <- read_csv("data/04_gdp_growth.csv", show_col_types = FALSE) %>%
+  filter(!is.na(gdp_growth_rate), year >= start_year) %>%
+  mutate(period = if_else(year %in% 1983:1985, "Crisis years (1983–85)", "Other years"))
+
+# 5. Exchange rate (monthly average, NIS per US$)
+df_fx <- read_csv("data/05_exchange_rate.csv", show_col_types = FALSE) %>%
+  filter(observation_date >= start_date)
+
+# ---- Optional: export all data to one Excel file (assignment requires it) -
+if (requireNamespace("writexl", quietly = TRUE)) {
+  writexl::write_xlsx(
+    list(
+      `1_CPI_inflation`  = df_cpi,
+      `2_Budget_balance` = df_deficit %>% select(year, deficit_gdp),
+      `3_FX_reserves`    = df_reserves %>% select(country, year, reserves_usd, reserves_bn),
+      `4_GDP_growth`     = df_gdp %>% select(observation_date, year, real_gdp, gdp_growth_rate),
+      `5_Exchange_rate`  = df_fx
+    ),
+    "data/israel_crisis_data.xlsx"
+  )
+}
+
+# ---- Shared styling ----------------------------------------------------
+col_main  <- "#1f4e79"
+col_bad   <- "#b23a48"
+col_good  <- "#2e7d5b"
+col_shade <- "#f2c14e"
+
+crisis_start  <- as.Date("1983-01-01")
+crisis_end    <- as.Date("1985-12-31")
+stabilization <- as.Date("1985-07-01")
+
+theme_crisis <- theme_minimal(base_size = 12) +
+  theme(
+    plot.title         = element_text(face = "bold", size = 14),
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.x = element_blank(),
+    legend.position    = "bottom",
+    legend.title       = element_blank()
+  )
+
+# Shared x-scales so all five charts cover the same window
+x_dates <- scale_x_date(limits = c(start_date, end_date),
+                        date_breaks = "4 years", date_labels = "%Y",
+                        expand = expansion(mult = 0.01))
+x_years <- scale_x_continuous(limits = c(start_year - 0.5, end_year + 0.5),
+                              breaks = seq(1972, 1996, 4))
+
+shade <- function(xmin, xmax, ymin, ymax) {
+  annotate("rect", xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
+           fill = col_shade, alpha = 0.22)
+}
+
+to_plotly <- function(p) {
+  ggplotly(p, tooltip = "text") %>%
+    config(displaylogo = FALSE) %>%
+    layout(
+      margin = list(l = 90, b = 60),
+      yaxis  = list(title = list(standoff = 15)),
+      legend = list(orientation = "h", x = 0, y = -0.15)
+    )
+}
+```
+
+In 1984, Israeli consumer prices rose by roughly 445 percent.[^merip] By mid-1985, inflation sat at above 15 percent a month. [^patinkin] The economy's foreign exchange reserves were quickly falling, as Israel experienced capital flight.[^bruno-intro] To improve the situation, a national-unity government led by Prime Minister Shimon Peres launched an emergency stabilization plan on July 1, 1985. [^brookings] The plan effectively ended the macroeconomic crisis in Israel: it only took a few months for monthly inflation to go down to 1 to 2 percent. Reserves were now rising, and unemployment only went up by about two percentage points. This has since been hailed as a successful model of rapid disinflation.[^bruno-disinflation]
+
+This blog post analyzes 5 key macroeconomic indicators to show how Israel got to the point of crisis, how it nearly lost control, and why the stabilization plan solved its issues. Each chart answers the next question in the chain: how fast did prices run away, why was the economy so vulnerable, how did Israelis react, why did output hold up, and how was the situation eventually handled? My analysis found that the crisis itself was a result of wages, bank deposits, government bonds, and exchange rate being tied to past price increases. This meant that every shock was automatically passed on and amplified. Throughout the blog, I draw on the metaphor of a fire; I imagine the budget deficit as the tinder, a bank-share collapse as the spark, and the indexation as the accelerant. To end the crisis, the Israelis had to fix the government budget and re-anchor prices in the country.
+
+*Finally, all charts in this analysis are interactive: you can hover over them to see the precise values of the measure at each time period. This will allow you to precisely correlate my charts to the textual analysis.*
+
+## A Ratchet That Only Turned Up
+
+```{r}
+#| label: chart-cpi
+
+peak <- df_cpi %>% slice_max(inflation, n = 1)
+ymax <- 550
+
+p_cpi <- ggplot(df_cpi, aes(observation_date, inflation, group = 1,
+                            text = paste0(format(observation_date, "%b %Y"),
+                                          "<br>Inflation: ", round(inflation, 1), "% year/year"))) +
+  shade(crisis_start, crisis_end, 0, ymax) +
+  geom_vline(xintercept = stabilization, linetype = "dashed", colour = "grey30") +
+  geom_line(colour = col_main, linewidth = 0.9) +
+  geom_point(data = peak, colour = col_bad, size = 3) +
+  # Peak label: centred ~2 years LEFT of the peak, clear of the dashed line
+  annotate("text", x = peak$observation_date - 800, y = peak$inflation + 20,
+           label = paste0("Peak: ", round(peak$inflation), "%"),
+           size = 3.5, colour = col_bad, fontface = "bold") +
+  # Stabilization label: centred ~3.3 years RIGHT of the dashed line
+  annotate("text", x = stabilization + 1200, y = 320,
+           label = "Dashed line indicates start \n of Israeli Stabilization Plan\n(July 1985)", size = 3.3) +
+  x_dates +
+  scale_y_continuous(breaks = seq(0, 500, 100), limits = c(0, ymax),
+                     labels = label_number(suffix = "%"), expand = c(0, 0)) +
+  labs(title = "Consumer price inflation, 1972–1995",
+       x = NULL, y = "Inflation (% year/year)") +
+  theme_crisis
+
+to_plotly(p_cpi)
+```
+*Chart 1*\
+*Source: OECD via FRED.*\
+*Series: ISRCPALTT01IXNBQ.*\
+*Measure: quarterly CPI, % change vs. the same quarter a year earlier.*\
+*Shaded area: 1983–85 (Crisis Period).*
+
+Chart 1 above shows year-over-year CPI inflation. At first, inflation increased in steps, such as in 1973-74, 1977, 1979, and 1983-84. After each jump, it settled onto a new plateau.[^bruno-steps] From 1980 to 1983, it hovered between 100 to 135 percent. Since then, it rapidly rose: from 126 percent in Q3 1983 to 175 percent in Q4 1983, hitting a peak of nearly 463 percent in Q4 1984.
+
+Inflation also ended sharply. After the July 1985 stabilization plan, it fell from 379 percent in the third quarter of 1985 to 211 percent in the fourth. By Q3 1986, it had fallen to a mere 21 percent. Despite this, inflation stayed between 15 to 22 percent until early 1992 and dropped below 8 percent only in late 1995.
+
+The answer to why inflation ratcheted upwards lies in the analysis of Israeli economist Michael Bruno, who led the efforts of the July 1985 stabilization plan. Bruno stated that Israel was an economy in which liquid financial assets were linked to prices or to the U.S. dollar. Therefore, the exchange rates adjusted roughly in line with past inflation. Wage agreements adjusted for price increases on a monthly basis.[^bruno-index] Price shocks, such as currency devaluations or subsidy cuts, were passed into wages, assets, and the exchange rate. This resulted in a higher rate of inflation. But indexation was the accelerant, something that helped the crisis spread, rather than the fire itself. To study what supplied the tinder, we have to look at the government’s balance sheet.
+
+## The Tinder and the Spark
+
+```{r}
+#| label: chart-deficit
+
+p_def <- ggplot(df_deficit, aes(year, deficit_gdp, fill = type,
+                                text = paste0(year, "<br>Balance: ",
+                                              round(deficit_gdp, 1), "% of GDP"))) +
+  shade(1982.5, 1985.5, min(df_deficit$deficit_gdp) * 1.1, max(df_deficit$deficit_gdp) * 1.1) +
+  geom_col(width = 0.75) +
+  geom_hline(yintercept = 0, colour = "grey30") +
+  scale_fill_manual(values = c("Deficit" = col_bad, "Surplus" = col_good)) +
+  x_years +
+  scale_y_continuous(labels = label_number(suffix = "%")) +
+  labs(title = "Central government fiscal balance, 1972–1995",
+       x = NULL, y = "% of GDP (negative = deficit)") +
+  theme_crisis
+
+to_plotly(p_def)
+```
+
+*Chart 2*\
+*Source: FRED.*\
+*Series: CASHBLILA188A.*\
+*Measure: central government fiscal balance, % of nominal GDP (negative = deficit).*\
+*Shaded area: 1983–85 (Crisis Period).*
+
+If you Google what the potential causes of such high inflation could be, one explanation that would appear is a large budget deficit financed by printing money. That is what Milton Friedman and the Chicago school of economics taught us. [^utah-recession] In Israel’s case, the deficit was large, but the relationship was not necessarily that simple. Big jumps in inflation between the mid-1970s and 1985 occurred while the deficit was large but stable at around 12 to 15 percent of GDP.[^bruno-deficit] So, the deficit alone does not explain why inflation exploded in 1983-84.
+
+Chart 2 shows the fiscal balance of the state of Israel between 1972 and 1995. What immediately sticks out is the drastic improvement in 1985. Before then, it was substantially and unfailingly negative. The roots of the deficit go back to 1973, when Israel fought the Yom Kippur War. Although it emerged victorious militarily, what followed was a “lost decade.” [^jpost-yom-kippur] Israel saw relative economic stagnation, soaring military expenditures, and national trauma. Investment was falling and there was growing dependence on foreign borrowing.[^bruno-decade] A decade of public spending beyond what the economy had produced meant that government debt stood at 284 percent of GDP. [^debt-boi] This was, at the time, one of the highest ratios in the world.[^bruno-debt] Simultaneously, the share of employment in the public sector (as opposed to the private sector) had grown from 20 to 30 percent over the decade. [^boi-1979]
+
+The large deficit also widened the balance-of-payments gap, leading to repeated devaluations and subsidy cuts. This pushed prices up. By 1984, real gross wages were about 16 percent above their 1980 level, while output per worker remained stagnant.[^bruno-wages] Spending raced ahead of what the economy could sustain.[^fischer-1983]
+
+A financial shock lit the fuse for the fire. For years, Israel’s banks had been artificially propping up their own share prices using client loans. They manipulated their stock prices by buying back their own shares to create an illusion of steady and guaranteed demand. [^alchetron-bank-crisis] Government-supported bank shares became one of the liquid assets that kept pace with inflation.[^banks] In October 1983, this system collapsed, and a large devaluation followed in the same quarter. In Israel, this was known as “Black Thursday”—the Tel Aviv stock exchange was forced to close for 18 days. [^ssrn-paper] The 1983 jump in inflation came in the fourth quarter, after both the bank-share crisis and the devaluation. Chart 1 shows exactly this. Once the fire was lit, the Israelis did what one does in a fire: they ran, from the Israeli shekel!
+
+## Running from the Shekel
+
+```{r}
+#| label: chart-reserves
+
+p_res <- ggplot(df_reserves, aes(year, reserves_bn, group = 1,
+                                 text = paste0(year, "<br>Reserves: $",
+                                               round(reserves_bn, 2), "B"))) +
+  shade(1982.5, 1985.5, 0, max(df_reserves$reserves_bn) * 1.1) +
+  geom_line(colour = col_main, linewidth = 0.9) +
+  geom_point(colour = col_main, size = 2) +
+  x_years +
+  scale_y_continuous(labels = label_dollar(suffix = "B"),
+                     limits = c(0, max(df_reserves$reserves_bn) * 1.1),
+                     expand = c(0, 0)) +
+  labs(title = "Foreign exchange reserves (excluding gold), 1972–1995",
+       x = NULL, y = "US$ billions (current)") +
+  theme_crisis
+
+to_plotly(p_res)
+```
+
+*Chart 3*\
+*Source: World Bank, World Development Indicators.*\
+*Series: FI.RES.XGLD.CD.*\
+*Measure: Total reserves minus gold (current US$).*\
+*Shaded area: 1983–85 (Crisis Period).*
+
+A currency’s value takes a tumble if the country is running out of foreign money. Chart 3 shows this pressure building for Israel. Foreign exchange reserves (excluding gold) fell by about 18 percent between 1982 and 1984, from $3.8 billion to $3.1 billion. Gold is excluded because gold bars cannot directly be used to intervene in the foreign exchange market and must be switched for fiat currency first. [^gold]
+
+In Israel’s case, reserves fell even as the trade balance improved. The Israeli economy underwent capital flight: Israelis lost faith in the government’s ability to restrain prices and bought dollars in large amounts.[^bruno-capital] By 1983-84, the country’s short-term foreign debts were larger than its reserves. This was a warning sign that was also seen in the 1982 Latin American debt crisis. [^urriola]
+
+The loss of confidence that was seen also affected interest rates. On the eve of the stabilization plan, dollar-linked assets earned an effective 17 percent per month in interest when measured in Israeli shekels. Immediately post-plan, that number fell to 3 percent. [^interest-bruno] This indicated that the plan successfully convinced people that the shekel would hold its value, dissipating the incentive to flee. [^boi-1985] Reserves rose about 20 percent in 1985, stayed positive for a few years before returning to the red in 1988. But the fire did not burn the real economy.
+
+## The Growth Paradox
+
+```{r}
+#| label: chart-gdp
+
+p_gdp <- ggplot(df_gdp, aes(year, gdp_growth_rate, fill = period,
+                            text = paste0(year, "<br>Real GDP growth: ",
+                                          round(gdp_growth_rate, 1), "%"))) +
+  geom_col(width = 0.75) +
+  geom_hline(yintercept = 0, colour = "grey30") +
+  scale_fill_manual(values = c("Crisis years (1983–85)" = col_bad,
+                               "Other years" = "grey65")) +
+  x_years +
+  scale_y_continuous(labels = label_number(suffix = "%")) +
+  labs(title = "Real GDP growth, 1972–1995",
+       x = NULL, y = "Annual growth (%)") +
+  theme_crisis
+
+to_plotly(p_gdp)
+```
+
+*Chart 4*\
+*Source: Penn World Table via FRED, series RGDPNAILA666NRUG.*\
+*Measure: real GDP at constant national prices, Israel.*\
+*Note: growth rates calculated by the author from year-over-year changes in the level.*
+
+Unlike most inflation crises scenarios, the Israeli crisis was not accompanied by an economic collapse. Chart 4 shows that Israeli real GDP growth never turned negative in the crisis years: it was at 3.4 percent in 1983, 0.9% in 1984, and 4 percent in 1985.
+
+In my view, instability, not stagnation, was the culprit of the crisis: time horizons for firm planning and investment shrank, there were considerable costs of constantly adjusting prices and wages, and Israel saw consistent investor confidence loss. As the chart shows, growth then recovered, at 4.2 percent in 1986, 7.1 percent in 1987, and 9.3 percent in 1995. But, this was not uniform, with a blip in 1989. So if output held up, why act at all? Because instability was rampant, and by mid-1985 the first attempt at dousing the fire had failed.
+
+## Putting Out the Fire
+
+```{r}
+#| label: chart-fx
+
+p_fx <- ggplot(df_fx, aes(observation_date, exchange_rate, group = 1,
+                          text = paste0(format(observation_date, "%b %Y"),
+                                        "<br>", signif(exchange_rate, 3), " NIS per US$"))) +
+  shade(crisis_start, crisis_end, min(df_fx$exchange_rate), max(df_fx$exchange_rate)) +
+  geom_vline(xintercept = stabilization, linetype = "dashed", colour = "grey30") +
+  geom_line(colour = col_main, linewidth = 0.9) +
+  # Label centred ~4.7 years right of the dashed line, below the flat post-1985 line
+  annotate("text", x = stabilization + 1700, y = 0.003,
+           label = "Dashed line indicates \n start of the Israeli Stabilization Plan. The \nshekel was pegged to the US$", size = 3.3) +
+  x_dates +
+  scale_y_log10(breaks = c(0.001, 0.01, 0.1, 1),
+                labels = function(x) format(x, scientific = FALSE, drop0trailing = TRUE)) +
+  labs(title = "Exchange rate, 1972–1995 (log scale)",
+       x = NULL, y = "New Israeli Shekel per US$ (log scale)") +
+  theme_crisis
+
+to_plotly(p_fx)
+```
+*Chart 5*\
+*Source: OECD via FRED, series CCUSMA02ILM618N.*\
+*Measure: Israeli shekel per US dollar, monthly average.*\
+*Note: log scale, so equal percentage changes look equal across the whole period.*\
+*Shaded area: 1983–85 (Crisis Period).*
+
+Initially, Israel tried to stabilize gradually. Between late 1984 and mid-1985, the government negotiated “package deals” with unions and employers that froze prices and set planned wage increased. [^package-deals] But, since these provisions were not accompanied by appropriate budget cuts and the shekel kept getting devalued, this attempt was rather unsuccessful.[^package-outcome] A freeze on prices does not serve the interests of the people if the exchange rate is constantly changing since persistent currency fluctuations inevitably trigger widespread product shortages, increased uncertainty, and black markets. By June 1985, the situation had deteriorated sufficiently to rule out a gradual solution.
+
+Instead, the Israeli government tried the quickfire stabilization plan. It attacked both causes of the crisis at once.[^bruno-plan] Fiscally, it announced a $1.5 billion cut in the budget deficit, totaling about 7.5 percent of GDP, mostly through subsidy cuts and taxes. There was also a planned 3 percent cut in public employment. On the nominal side, Israel devalued the shekel by 18.8 percent and then pegged it to the dollar. It also froze wages, prices, and credit. The Histadrut, Israel’s largest labor federation, agreed to a temporary suspension of cost-of-living adjustments in exchange for immediate compensation of 14 percent of wages.[^bruno-wage] The United States too came to the aid of Israel: it supported Israel’s initiatives with $750 million in emergency aid in 1985 and 1986, easing Israel’s potential transitional pain.[^crs-aid] On the other hand, the fiscal cut was less than ideal: political leaders ruled out cuts to the defense budget, so the reduction ended up being $1.5 billion rather than the $2 to $2.5 billion required to prevent the growth of government debt.[^patinkin-fiscal]
+
+The central anchor was the exchange rate, and together with the matching freeze in nominal wages, price controls completed the system. The controls were eventually lifted from January 1986 as the Israeli economy was recovering.[^bruno-fx] This eventual stabilization carried a modest cost. Average real gross wages fell by about 14 percent between fiscal year 1984 and 1985. As noted, unemployment went up by two percentage points, while real interest rates stayed high for months.[^bruno-cost]
+
+Chart 5 shows the shekel’s performance, and is the litmus test for the plan’s efficacy. During the crisis, the shekel’s value fell forty-fold against the dollar between January 1983 and July 1985, from about 0.035 to 1.49 new shekels per dollar. The chart uses a log scale for proper visibility, because Israel’s exchange rate changed 7,000-fold over the period, meaning a linear scale would make everything from 1972 to the late 1970s look flat. Log scales make equal percentage changes look equal, and applying them was also important as Israel redenominated its currency, including a 1,000-to-1 change in 1985-86 (from the hyperinflated Israeli Shekel to the New Israeli Shekel). After July 1985, the line went flat. The rate stood at 1.49 in January and July 1986, barely moving. Once the shekel was pegged, the accelerant was gone: past prices no longer fed wages, assets, and the exchange rate.
+
+## What We Can Learn From This
+
+In my view, here is what the Israeli case teaches us:
+
+1. The crisis required a coordinated fiscal and monetary response. The deficit in the country was a long-term problem, but the inflation was driven by the way the system amplified shocks. The solution required both fiscal and nominal measures: freezing prices without fiscal reform was not credible, and fixing the budget without freezing wages and the exchange rate did not work either.
+
+2. Credibility matters. The gradual process that was attempted initially asked the public to believe in a slow, drawn-out process. But, in the end, a sudden, comprehensive plan, backed by the government, unions, and employers, worked by changing expectations quickly. This is shown by the collapse in dollar interest rates.
+
+3. The plan was a start to the recovery. It was helped by external aid, and most of its budgetary cuts came from subsidy cuts and taxes rather than reduced direct government activity.[^bruno-open] Inflation remained high at 15 to 22 percent for years, and lasting success depended on budget restraint and wage moderation. By stopping the crisis, the plan created the conditions for growth in the 1990s. It did not deliver this growth on its own.
+
+Finally, there is also value in thinking through the political lens. Israel’s high inflation was fixed by a political coalition that agreed to share the pain for the country’s future rather than a specific economic ideology.
+
+## Bibliography
+
+Alchetron. “1983 Israel Bank Stock Crisis.” Accessed November 2026. <https://alchetron.com/1983-Israel-bank-stock-crisis>.
+
+Bahar, Dany. “How Shimon Peres Saved the Israeli Economy.” Brookings Institution. <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
+
+Bank of Israel. *Annual Report 1979*. Jerusalem: Bank of Israel, 1980. <https://boi.org.il/media/odwlzrjf/pe_10.pdf>.
+
+———. *Annual Report 1985*. Jerusalem: Bank of Israel, 1986. <https://www.boi.org.il/media/fecp5es5/pe_8.pdf>.
+
+Blass, Asher A., and Richard S. Grossman. “Financial Fraud and Banking Stability: The Israeli Bank Crisis of 1983 and Trial of 1990.” *International Review of Law and Economics* 16 (1996): 461–72.
+
+Bruno, Michael. “Generating a Sharp Disinflation: Israel 1985.” NBER Working Paper 1822. Cambridge, MA: National Bureau of Economic Research, 1986. <https://www.nber.org/system/files/working_papers/w1822/w1822.pdf>.
+
+Bruno, Michael, and Sylvia Piterman. “Israel’s Stabilization: A Two-Year Review.” NBER Working Paper 2398. Cambridge, MA: National Bureau of Economic Research, 1987. <https://www.nber.org/papers/w2398>.
+
+Congressional Research Service. *U.S. Foreign Aid to Israel*. Report prepared for Members and Committees of Congress, RL33222. Washington, DC: Library of Congress. <https://www.everycrsreport.com/files/20070425_RL33222_ee97f8a100b2abd96b43a0f4d0cc6848e74efb26.pdf>.
+
+Fischer, Stanley. “The Economy of Israel.” NBER Working Paper 1190. Cambridge, MA: National Bureau of Economic Research, 1983. <https://www.nber.org/papers/w1190>.
+
+*The Jerusalem Post*. “Who Lost the Yom Kippur War? - Opinion,” October 2021. <https://www.jpost.com/opinion/who-lost-the-yom-kippur-war-opinion-681383>.
+
+Leiderman, Leonardo, and Assaf Razin. “Propagation of Shocks in a High-Inflation Economy: Israel, 1980–85.” NBER Working Paper 2003. Cambridge, MA: National Bureau of Economic Research, 1986. <https://www.nber.org/papers/w2003>.
+
+Leonard, Natalie. “Israeli Bank Shares Arrangement.” SSRN Electronic Journal, SSRN ID: 3981062. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3981062>.
+
+MERIP. “Israel’s Economic Crisis.” *MERIP Reports*, October 1985. <https://www.merip.org/1985/10/israels-economic-crisis/>.
+
+Patinkin, Don. “Israel’s Stabilization Program of 1985, or Some Simple Truths of Monetary Theory.” *Journal of Economic Perspectives* 7, no. 2 (Spring 1993): 103–28. <https://doi.org/10.1257/jep.7.2.103>.
+
+Trading Economics. “Israel Government Debt to GDP.” Accessed November 8, 2026. <https://tradingeconomics.com/israel/government-debt-to-gdp>.
+
+Urriola, Rafael. “Chile’s Economic Liberalization and Control of Foreign Capital Inflow.” *Studien zur internationalen Finanzarchitektur* 2000, no. 2. Bonn: Friedrich-Ebert-Stiftung Library, 2000. <https://library.fes.de/fulltext/iez/00766.htm>.
+
+Utah Foundation. “Thoughts on the Current Recession: Chicago Economics.” Research Report. Accessed November 2026. <https://www.utahfoundation.org/wp-content/uploads/thoughts-on-the-current-recession-chicago-economics.pdf>.
+
+Ziblim, Caleb Wuninti. “Analysis: Why the Bank of Ghana Sold Half Its Gold Reserves.” MyJoyOnline. Accessed November 8, 2026. <https://www.myjoyonline.com/analysis-why-the-bank-of-ghana-sold-half-its-gold-reserves/>.
+
+## AI Use Statement
+
+AI was used to do research on the Israeli inflation crisis, find sources for claims made in the paper, and to point to viable sources for the datasets. It was not used to generate the charts or to write the prose.
+
+[^merip]: MERIP, "Israel's Economic Crisis," *MERIP Reports*, October 1985, <https://www.merip.org/1985/10/israels-economic-crisis/>.
+
+[^debt-boi]: Trading Economics, "Israel Government Debt to GDP," accessed November 8, 2026, <https://tradingeconomics.com/israel/government-debt-to-gdp>, citing Bank of Israel data.
+
+[^boi-1979]: Bank of Israel, *Annual Report 1979* (Jerusalem: Bank of Israel, 1980), chap. 10, 179, <https://boi.org.il/media/odwlzrjf/pe_10.pdf>.
+
+[^patinkin]: Don Patinkin, "Israel's Stabilization Program of 1985, or Some Simple Truths of Monetary Theory," *Journal of Economic Perspectives* 7, no. 2 (Spring 1993): 103–28, <https://doi.org/10.1257/jep.7.2.103>.
+
+[^brookings]: Dany Bahar, "How Shimon Peres Saved the Israeli Economy," Brookings Institution, <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
+
+[^bruno-disinflation]: Bruno, "Generating a Sharp Disinflation," abstract, sections 2.3 and 3, and table 5.
+
+[^bruno-intro]: Michael Bruno, "Generating a Sharp Disinflation: Israel 1985," NBER Working Paper 1822 (Cambridge, MA: National Bureau of Economic Research, 1986), abstract and introduction, <https://www.nber.org/system/files/working_papers/w1822/w1822.pdf>
+
+[^bruno-steps]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+
+[^bruno-index]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+
+[^bruno-deficit]: Bruno, "Generating a Sharp Disinflation," sec. 1.1 and table 2.
+
+[^bruno-debt]: Bruno, "Generating a Sharp Disinflation," secs. 1 and 1.1.
+
+[^bruno-wages]: Bruno, "Generating a Sharp Disinflation," sec. 3 and table 5.
+
+[^utah-recession]: Utah Foundation, "Thoughts on the Current Recession: Chicago Economics," Research Report, accessed November 2026, <https://www.utahfoundation.org/wp-content/uploads/thoughts-on-the-current-recession-chicago-economics.pdf>.
+
+[^jpost-yom-kippur]: *The Jerusalem Post*, "Who Lost the Yom Kippur War? - Opinion," October 2021, <https://www.jpost.com/opinion/who-lost-the-yom-kippur-war-opinion-681383>.
+
+[^banks]: Asher A. Blass and Richard S. Grossman, "Financial Fraud and Banking Stability: The Israeli Bank Crisis of 1983 and Trial of 1990," *International Review of Law and Economics* 16 (1996): 461–72; Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+
+[^bruno-capital]: Bruno, "Generating a Sharp Disinflation," sec. 1 and fig. 3.
+
+[^bruno-decade]: Bruno, "Generating a Sharp Disinflation," sec. 1.
+
+[^bruno-cost]: Bruno, "Generating a Sharp Disinflation," abstract, sec. 3, and table 5.
+
+[^bruno-plan]: Bruno, "Generating a Sharp Disinflation," secs. 2.1–2.2.
+
+[^bruno-fx]: Bruno, "Generating a Sharp Disinflation," secs. 2.2–2.3.
+
+[^bruno-wage]: Bruno, "Generating a Sharp Disinflation," sec. 2.4.
+
+[^bruno-open]: Bruno, "Generating a Sharp Disinflation," secs. 2.1 and 4. 
+
+[^fischer-1983]: Stanley Fischer, "The Economy of Israel," NBER Working Paper 1190 (Cambridge, MA: National Bureau of Economic Research, 1983), 29–32, <https://www.nber.org/papers/w1190>.
+
+[^alchetron-bank-crisis]: Alchetron, "1983 Israel Bank Stock Crisis," accessed November 2026, <https://alchetron.com/1983-Israel-bank-stock-crisis>.
+
+[^ssrn-paper]: Natalie Leonard, "Israeli Bank Shares Arrangement," SSRN Electronic Journal, SSRN ID: 3981062, <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3981062>.
+
+[^gold]: Caleb Wuninti Ziblim, "Analysis: Why the Bank of Ghana Sold Half Its Gold Reserves," MyJoyOnline, accessed November 8, 2026, <https://www.myjoyonline.com/analysis-why-the-bank-of-ghana-sold-half-its-gold-reserves/>.
+
+[^urriola]: Rafael Urriola, "Chile's Economic Liberalization and Control of Foreign Capital Inflow," Studien zur internationalen Finanzarchitektur 2000, no. 2 (Bonn: Friedrich-Ebert-Stiftung Library, 2000), <https://library.fes.de/fulltext/iez/00766.htm>.
+
+[^interest-bruno]: Bruno, "Generating a Sharp Disinflation," [sec. 3.1].
+
+[^boi-1985]: Bank of Israel, *Annual Report 1985* (Jerusalem: Bank of Israel, 1986), 120, 133, <https://www.boi.org.il/media/fecp5es5/pe_8.pdf>.
+
+[^package-deals]: Michael Bruno and Sylvia Piterman, "Israel's Stabilization: A Two-Year Review," NBER Working Paper 2398 (Cambridge, MA: National Bureau of Economic Research, 1987), 4–5, <https://www.nber.org/papers/w2398>.
+
+[^package-outcome]: Bank of Israel, *Annual Report 1985*, 128, 133; Leonardo Leiderman and Assaf Razin, "Propagation of Shocks in a High-Inflation Economy: Israel, 1980–85," NBER Working Paper 2003 (Cambridge, MA: National Bureau of Economic Research, 1986), 4, <https://www.nber.org/papers/w2003>.
+
+[^crs-aid]: Congressional Research Service, *U.S. Foreign Aid to Israel*, report prepared for Members and Committees of Congress, RL33222 (Washington, DC: Library of Congress), <https://www.everycrsreport.com/files/20070425_RL33222_ee97f8a100b2abd96b43a0f4d0cc6848e74efb26.pdf>.
+
+[^patinkin-fiscal]: Patinkin, “Israel's Stabilization Program of 1985,” 103–28.

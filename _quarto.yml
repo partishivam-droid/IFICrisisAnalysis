@@ -1,0 +1,21 @@
+project:
+  type: website
+  output-dir: docs
+  resources:
+    - data/*.csv
+    - data/*.xlsx
+
+website:
+  title: "Israel's 1983–1985 Inflation Crisis"
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Blog & Charts"
+format:
+  html:
+    theme: flatly
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    fig-width: 8
+    fig-height: 5
