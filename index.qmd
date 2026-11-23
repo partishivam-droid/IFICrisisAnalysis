@@ -239,7 +239,7 @@ to_plotly(p_def)
 *Chart 2*\
 *Source: Bruno (1986), Table 2, citing Bank of Israel Research Department and the Accountant General's Office.*\
 *Measure: domestic government deficit, % of GDP, excluding and including interest. Fiscal years run April–March.*\
-*Note: The two right-hand pairs compare April–November 1984 with April–November 1985. They are partial periods, not full-year figures. Bruno's estimates do not correct for the inflationary erosion of unindexed loans to the private sector, which he puts at an additional 5–8 percent of GDP in 1978–82 and 1–2 percent in 1983–84.*
+*Note: The two right-hand pairs compare April–November 1984 with April–November 1985. They are partial periods, not full-year figures; Bruno reports only these months for those years. Bruno's estimates do not correct for the inflationary erosion of unindexed loans to the private sector, which he puts at an additional 5–8 percent of GDP in 1978–82 and 1–2 percent in 1983–84.*
 
 A textbook explanation of very high inflation, associated with Milton Friedman's monetarism, points to a large deficit financed by money creation.[^friedman] In Israel's case, the deficit was large, but the relationship was not that simple. Bruno describes the deficit as "more or less stable" at 12 to 15 percent of GDP while inflation leapt from 30 to 40 percent in 1973–76 to nearly 500 percent annualized in 1984–85.[^bruno-deficit] Chart 2 draws on his Table 2: the deficit including interest ranged from 8 to 15 percent of GDP in 1977–84, mostly near 9 percent, and it was no larger in 1983 than in 1979–80. Therefore, the deficit alone does not explain why inflation exploded in 1983–84.
 
@@ -387,7 +387,7 @@ Fischer, Stanley. "The Economy of Israel." NBER Working Paper 1190. Cambridge, M
 
 Frenkel, Shlomo. "Israel's Economic Crisis." *MERIP Reports* 136–137 (October 1985). <https://www.merip.org/1985/10/israels-economic-crisis/>.
 
-Friedman, Milton. *The Counter-Revolution in Monetary Theory*. IEA Occasional Paper 33. London: Institute of Economic Affairs, 1970.
+Friedman, Milton. "The Counter-Revolution in Monetary Theory." In *Explorations in Economic Liberalism: The Wincott Lectures*, edited by Geoffrey E. Wood, 3–21. London: Palgrave Macmillan, 1996. <https://doi.org/10.1007/978-1-349-24967-1_1>. Originally published as IEA Occasional Paper 33 (London: Institute of Economic Affairs, 1970).
 
 Leiderman, Leonardo, and Assaf Razin. "Propagation of Shocks in a High-Inflation Economy: Israel, 1980–85." NBER Working Paper 2003. Cambridge, MA: National Bureau of Economic Research, 1986. <https://www.nber.org/papers/w2003>.
 
@@ -417,9 +417,9 @@ AI was used to do research on the Israeli inflation crisis, find sources for cla
 
 [^bruno-index]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
 
-[^friedman]: Milton Friedman, *The Counter-Revolution in Monetary Theory*, IEA Occasional Paper 33 (London: Institute of Economic Affairs, 1970), p. 18. <https://link.springer.com/chapter/10.1007/978-1-349-24967-1_1>
+[^friedman]: Milton Friedman, "The Counter-Revolution in Monetary Theory," in *Explorations in Economic Liberalism: The Wincott Lectures*, ed. Geoffrey E. Wood (London: Palgrave Macmillan, 1996), 18, <https://doi.org/10.1007/978-1-349-24967-1_1>.
 
-[^bruno-deficit]: Bruno, "Generating a Sharp Disinflation," sec. 1.1 and table 2. Table 2 reports the deficit including interest as 13, 8, 9, 9, 14, 9, 9, and 15 percent of GDP for 1977–84.
+[^bruno-deficit]: Bruno, "Generating a Sharp Disinflation," sec. 1.1 and table 2. Table 2 reports the deficit including interest as 13, 8, 9, 9, 14, 9, 9, and 15 percent of GDP for 1977–84. See also note d to Table 2 on the inflation correction of public lending (about 5–8 percent of GDP in 1978–82 and 1–2 percent in 1983–84), which is not included in these figures.
 
 [^fischer-slowdown]: Stanley Fischer, "The Economy of Israel," NBER Working Paper 1190 (1983), 2; Frenkel, "Israel's Economic Crisis" (on military spending).
 
