@@ -152,7 +152,7 @@ to_plotly <- function(p, legend = FALSE) {
     )
 }
 ```
-Israeli consumer-price inflation peaked at 463 percent year-over-year in Q4 1984 (Chart 1). In mid-1985, inflation stood at above 12 percent a month, or about 290 percent annualized.[^monthly-boi] The economy's foreign exchange reserves were quickly falling, as Israel experienced capital flight.[^bruno-intro] To improve the situation, a national-unity government led by Prime Minister Shimon Peres launched an emergency stabilization plan on July 1, 1985.[^brookings] The plan effectively ended the macroeconomic crisis: within a few months, monthly inflation fell to 1 to 2 percent, reserves were rising, and unemployment rose by only about two percentage points. This has since been hailed as a successful model of rapid disinflation.[^bruno-disinflation] My thesis is that the crisis was not caused by a large deficit alone: indexing wages, assets, and the exchange rate to past prices turned a persistent fiscal imbalance and a financial shock into near-hyperinflation, which is why only a combined fiscal and exchange-rate reform could end it.
+Israeli consumer-price inflation peaked at 463 percent year-over-year in Q4 1984 (Chart 1). In mid-1985, inflation stood at above 12 percent a month, or about 290 percent annualized.[^monthly-boi] The economy's foreign exchange reserves were quickly falling, as Israel experienced capital flight.[^bruno-intro] To improve the situation, a national-unity government led by Prime Minister Shimon Peres launched an emergency stabilization plan on July 1, 1985.[^brookings] The plan effectively ended the macroeconomic crisis: within a few months, monthly inflation fell to 1 to 2 percent, reserves were rising, and unemployment rose by only about two percentage points. This has since been hailed as a successful model of rapid disinflation. My thesis is that the crisis was not caused by a large deficit alone: indexing wages, assets, and the exchange rate to past prices turned a persistent fiscal imbalance and a financial shock into near-hyperinflation, which is why only a combined fiscal and exchange-rate reform could end it.
 
 This blog post analyzes five key macroeconomic indicators to show how Israel got to the point of crisis, how it nearly lost control, and why the stabilization plan worked. Each chart answers the next question in the chain: how fast did prices run away, why was the economy so vulnerable, how did Israelis react, why did output hold up, and how was the situation eventually handled? Throughout, I use the metaphor of a fire: the budget deficit is the tinder, a bank-share collapse the spark, and indexation the accelerant. To end the crisis, Israel had to fix the government budget and re-anchor prices.
 
@@ -191,13 +191,14 @@ to_plotly(p_cpi)
 *Source: OECD via FRED.*\
 *Series: ISRCPALTT01IXNBQ.*\
 *Measure: quarterly CPI, % change vs. the same quarter a year earlier.*\
-*Shaded area: 1983–85 (Crisis Period). Dashed line: July 1985 stabilization plan.*
+*Shaded area: 1983–85 (Crisis Period).*\
+*Dashed line: July 1985 stabilization plan.*
 
-Chart 1 above shows year-over-year CPI inflation. At first, inflation increased in steps, such as in 1973–74, 1977, 1979, and 1983–84. After each jump, it settled onto a new plateau.[^bruno-steps] From 1980 to 1983, it hovered between 104 and 136 percent. Then it rose rapidly: from 126 percent in Q3 1983 to 175 percent in Q4 1983, peaking at 463 percent in Q4 1984.
+Chart 1 above shows year-over-year CPI inflation. In the run-up to the crisis, inflation increased in steps, such as in 1973–74, 1977, 1979, and 1983–84. After each jump, it settled onto a new plateau.[^bruno-steps] From 1980 to 1983, it hovered between 104 and 136 percent. Then it rose rapidly: from 126 percent in Q3 1983 to 175 percent in Q4 1983, peaking at 463 percent in Q4 1984.
 
-Inflation also ended sharply. After the July 1985 stabilization plan, it fell from 379 percent in the third quarter of 1985 to 211 percent in the fourth. By Q3 1986, it had fallen to just 21 percent. Despite this, inflation stayed between 15 and 22 percent until early 1992 and dropped below 8 percent only in late 1995.
+After the crisis, inflation ended sharply. After the July 1985 stabilization plan, it fell from 379 percent in the third quarter of 1985 to 211 percent in the fourth. By Q3 1986, it had fallen to just 21 percent. Despite this, inflation stayed between 15 and 22 percent until early 1992 and dropped below 8 percent only in late 1995.
 
-The answer to why inflation ratcheted upwards lies in the analysis of Michael Bruno, the Israeli economist who helped lead the July 1985 stabilization effort. Bruno stated that Israel was an economy in which liquid financial assets were linked to prices or to the U.S. dollar. Therefore, the exchange rate adjusted roughly in line with past inflation, and wage agreements adjusted for price increases monthly.[^bruno-index] Price shocks, such as currency devaluations or subsidy cuts, were passed into wages, assets, and the exchange rate, which produced still higher inflation. But indexation was the accelerant, something that helped the crisis spread, rather than the fire itself. To find the tinder, we have to look at the government's balance sheet.
+The answer to why inflation ratcheted upwards lies in the analysis of Michael Bruno, the Israeli economist who helped lead the July 1985 stabilization effort. Bruno stated that Israel was an economy in which liquid financial assets were linked to prices or to the U.S. dollar. Therefore, the exchange rate adjusted roughly in line with past inflation, and wage agreements adjusted for price increases monthly.[^bruno-index] Price shocks, such as currency devaluations or subsidy cuts, were passed into wages, assets, and the exchange rate, which produced higher inflation. But indexation was the accelerant, something that helped the crisis spread, rather than the fire itself. To find the tinder, we have to look at the government's balance sheet.
 
 ## The Tinder and the Spark
 
@@ -277,7 +278,7 @@ to_plotly(p_res)
 *Measure: Total reserves minus gold (current US$).*\
 *Shaded area: 1983–85 (Crisis Period).*
 
-A currency comes under pressure when the country is running out of foreign money. Chart 3 shows this pressure building for Israel. Foreign exchange reserves (excluding gold) fell by about 18 percent between 1982 and 1984, from $3.8 billion to $3.1 billion. The series counts the assets a central bank can deploy directly, such as foreign exchange holdings, special drawing rights, and the IMF reserve position, and leaves out gold.[^wdi-reserves]
+A currency comes under pressure when the country is running out of foreign money. Chart 3 shows this pressure building for Israel. Foreign exchange reserves (excluding gold) fell by about 18 percent between 1982 and 1984, from $3.8 billion to $3.1 billion. (The series counts the assets a central bank can deploy directly, such as foreign exchange holdings, special drawing rights, and the IMF reserve position, and leaves out gold.)[^wdi-reserves]
 
 In Israel's case, reserves fell even as the trade balance improved. The Israeli economy underwent capital flight: Israelis lost faith in the government's ability to restrain prices and bought dollars in large amounts.[^bruno-capital] By 1983–84, the country's short-term foreign debts exceeded its reserves, a warning sign also seen before the 1982 Latin American debt crisis.[^latam]
 
@@ -339,15 +340,16 @@ to_plotly(p_fx)
 *Source: OECD via FRED, series CCUSMA02ILM618N.*\
 *Measure: new Israeli shekels per US dollar, monthly average.*\
 *Note: log scale, so equal percentage changes look equal across the whole period.*\
-*Shaded area: 1983–85 (Crisis Period). Dashed line: July 1985 stabilization plan; the shekel was pegged to the US dollar.*
+*Shaded area: 1983–85 (Crisis Period).*\
+*Dashed line: July 1985 stabilization plan; the shekel was pegged to the US dollar.*
 
 Initially, Israel tried to stabilize gradually. Between late 1984 and mid-1985, the government negotiated "package deals" with unions and employers that froze prices and set planned wage increases.[^package-deals] But since these provisions were not accompanied by appropriate budget cuts and the shekel kept being devalued, the attempt was largely unsuccessful.[^package-outcome] A price freeze does not work if the exchange rate keeps moving, since persistent currency fluctuations trigger product shortages, uncertainty, and black markets. By June 1985, the situation had deteriorated enough to rule out a gradual solution.
 
-Instead, the government launched a rapid stabilization plan that attacked both causes of the crisis at once.[^bruno-plan] Fiscally, it announced a $1.5 billion cut in the budget deficit, about 7.5 percent of GDP, mostly through subsidy cuts and taxes, along with a planned 3 percent cut in public employment. Chart 2 shows the result: the deficit including interest fell from 15 to 6 percent of GDP between April–November 1984 and the same months of 1985. On the nominal side, Israel devalued the shekel by 18.8 percent and then pegged it to the dollar. It also froze wages, prices, and credit. The Histadrut, Israel's largest labor federation, agreed to a temporary suspension of cost-of-living adjustments in exchange for immediate compensation of 14 percent of wages.[^bruno-wage] The United States also came to Israel's aid, supporting the plan with $750 million in emergency aid in 1985 and 1986.[^crs-aid] On the other hand, the fiscal cut was less than ideal: political leaders ruled out cuts to the defense budget, so the reduction ended up being $1.5 billion[^merip-onehalf] rather than the $2 to $2.5 billion required to prevent the growth of government debt.[^bruno-twotwopointfive]
+Instead, the government launched a rapid stabilization plan that attacked both causes of the crisis at once.[^bruno-plan] Fiscally, it announced a $1.5 billion cut in the budget deficit,[^bruno-p14] about 7.5 percent of GDP, mostly through subsidy cuts and taxes, along with a planned 3 percent cut in public employment.[^bruno-cutpublic] Chart 2 shows the result: the deficit including interest fell from 15 to 6 percent of GDP between April–November 1984 and the same months of 1985. On the nominal side, Israel devalued the shekel by 18.8 percent and then pegged it to the dollar.[^bruno-p18] It also froze wages, prices, and credit.[^imf-1990] The Histadrut, Israel's largest labor federation, agreed to a temporary suspension of cost-of-living adjustments in exchange for immediate compensation of 14 percent of wages.[^bruno-wage] The United States also came to Israel's aid, supporting the plan with $750 million in emergency aid in 1985 and 1986.[^crs-aid] On the other hand, the fiscal cut was less than ideal: political leaders ruled out cuts to the defense budget, so the reduction ended up being $1.5 billion[^merip-onehalf] rather than the $2 to $2.5 billion required to prevent the growth of government debt.[^bruno-twotwopointfive]
 
 The exchange rate adjustment, together with the matching freeze in nominal wages and price controls, completed the stabilization plan. The controls were eventually lifted from January 1986 as the economy recovered.[^bruno-fx] Yet, stabilization also carried a modest cost. Average real gross wages fell by about 14 percent between fiscal year 1984 and 1985, unemployment rose by two percentage points, and real interest rates stayed high for months.[^bruno-cost]
 
-Chart 5 shows the shekel's path and is the litmus test for the plan. Between January 1983 and July 1985, the shekel lost value about forty-three-fold against the dollar, from about 0.035 to 1.49 new shekels per dollar. Over 1972 to July 1985 the rate rose about 3,500-fold (from 0.00042), and by December 1995 it stood at 3.12, about 7,400 times its 1972 level. A log scale is used because it makes equal percentage changes look equal; on a linear scale, everything before the early 1980s would look flat. The series is expressed in new shekels throughout, so the 1985–86 redenomination does not distort it. After July 1985, the line went flat: the rate stood at 1.49 in both January and July 1986. Once the shekel was pegged, the accelerant was gone: past prices no longer fed wages, assets, and the exchange rate.
+Chart 5 shows the shekel's path and is the litmus test for the plan. Between January 1983 and July 1985, the shekel lost value about forty-three-fold against the dollar, from about 0.035 to 1.49 new shekels per dollar. Over 1972 to July 1985 the rate rose about 3,500-fold (from 0.00042), and by December 1995 it stood at 3.12, about 7,400 times its 1972 level. (A log scale is used because it makes equal percentage changes look equal; on a linear scale, everything before the early 1980s would look flat.) In 1985–86, Israel replaced the old shekel with the new shekel at a rate of 1,000 old shekels to 1 new shekel, which removed three zeros from prices and wages.[^udo-agbai] The series is expressed in new shekels throughout, so the redenomination does not distort it. After July 1985, the line went flat: the rate stood at 1.49 in both January and July 1986. Once the shekel was pegged, the accelerant was gone: past prices no longer fed wages, assets, and the exchange rate.
 
 ## What We Can Learn From This
 
@@ -357,15 +359,15 @@ Chart 5 shows the shekel's path and is the litmus test for the plan. Between Jan
 
 3. The plan was a start to the recovery, not the whole of it. It was helped by external aid, and most of its budgetary cuts came from subsidy cuts and taxes rather than reduced direct government activity.[^bruno-open] Inflation remained at 15 to 22 percent for years, and lasting success depended on budget restraint and wage moderation. By stopping the crisis, the plan may have helped create the conditions for growth in the 1990s,[^bahar-growth] but the early-1990s wave of immigration confounded the causes of growth, so the plan cannot take the credit for that growth alone.[^immigration]
 
-Finally, there is value in thinking through the political lens. In my reading, Israel's high inflation was fixed by a political coalition of government, unions, and employers that agreed to share the pain for the country's future, rather than by a specific economic ideology.[^bruno-politics]
+4. Finally, there is value in thinking through the political lens. In my reading, Israel's high inflation was fixed by a political coalition of government, unions, and employers that agreed to share the pain for the country's future, rather than by a specific economic ideology.[^bruno-politics]
 
 ## Bibliography
 
-Bahar, Dany. "How Shimon Peres Saved the Israeli Economy." Brookings Institution. <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
+Bahar, Dany. "How Shimon Peres Saved the Israeli Economy." Brookings Institution. Accessed November 11, 2026. <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
 
 Bank of Israel. *Annual Report 1979*. Jerusalem: Bank of Israel, 1980. Chap. 10. <https://boi.org.il/media/odwlzrjf/pe_10.pdf>.
 
-Bank of Israel. *Annual Report 1985*. Jerusalem: Bank of Israel, 1986. Chap. 3. <https://boi.org.il/media/zi1injbo/pe_3.pdf>.
+———. *Annual Report 1985*. Jerusalem: Bank of Israel, 1986. Chap. 3. <https://boi.org.il/media/zi1injbo/pe_3.pdf>.
 
 ———. *Annual Report 1985*. Jerusalem: Bank of Israel, 1986. Chap. 8. <https://www.boi.org.il/media/fecp5es5/pe_8.pdf>.
 
@@ -379,7 +381,7 @@ Congressional Research Service. *U.S. Foreign Aid to Israel*. Report prepared fo
 
 Eckstein, Zvi, and Yoram Weiss. "On the Wage Growth of Immigrants: Israel, 1990–2000." *Journal of the European Economic Association* 2, no. 4 (2004): 665–95.
 
-Federal Reserve History. "Latin American Debt Crisis of the 1980s." <https://www.federalreservehistory.org/essays/latin-american-debt-crisis>.
+Federal Reserve History. "Latin American Debt Crisis of the 1980s." Accessed November 16, 2026. <https://www.federalreservehistory.org/essays/latin-american-debt-crisis>.
 
 Feenstra, Robert C., Robert Inklaar, and Marcel P. Timmer. "The Next Generation of the Penn World Table." *American Economic Review* 105, no. 10 (2015): 3150–82.
 
@@ -389,6 +391,8 @@ Frenkel, Shlomo. "Israel's Economic Crisis." *MERIP Reports* 136–137 (October 
 
 Friedman, Milton. "The Counter-Revolution in Monetary Theory." In *Explorations in Economic Liberalism: The Wincott Lectures*, edited by Geoffrey E. Wood, 3–21. London: Palgrave Macmillan, 1996. <https://doi.org/10.1007/978-1-349-24967-1_1>. Originally published as IEA Occasional Paper 33 (London: Institute of Economic Affairs, 1970).
 
+International Monetary Fund. "The Role of Monetary Policy in Israel's 1985 Stabilization Effort." IMF Working Paper WP/90/29. Washington, DC: International Monetary Fund, 1990. <https://www.elibrary.imf.org/view/journals/001/1990/029/article-A001-en.xml>.
+
 Leiderman, Leonardo, and Assaf Razin. "Propagation of Shocks in a High-Inflation Economy: Israel, 1980–85." NBER Working Paper 2003. Cambridge, MA: National Bureau of Economic Research, 1986. <https://www.nber.org/papers/w2003>.
 
 Leonard, Natalie. "Israeli Bank Shares Arrangement." SSRN Electronic Journal, SSRN ID: 3981062. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3981062>.
@@ -396,6 +400,8 @@ Leonard, Natalie. "Israeli Bank Shares Arrangement." SSRN Electronic Journal, SS
 OECD. "Consumer Price Index: All Items for Israel" (ISRCPALTT01IXNBQ) and "Exchange Rate: National Currency per US Dollar for Israel" (CCUSMA02ILM618N). Retrieved from FRED, Federal Reserve Bank of St. Louis. <https://fred.stlouisfed.org/>. Accessed November 11, 2026.
 
 Trading Economics. "Israel Government Debt to GDP." Accessed November 8, 2026. <https://tradingeconomics.com/israel/government-debt-to-gdp>.
+
+Udo, Okey Okoro, and Edward Perekebina Agbai. "The Impact of Currency Redenomination on Economic Development." *Journal of Accounting and Financial Management* 9, no. 10 (2023): 114–32. <https://doi.org/10.56201/jafm.v9.no10.2023.pg114.132>.
 
 University of Groningen and University of California, Davis. "Real GDP at Constant National Prices for Israel" (RGDPNAILA666NRUG). Penn World Table, retrieved from FRED, Federal Reserve Bank of St. Louis. <https://fred.stlouisfed.org/series/RGDPNAILA666NRUG>. Accessed November 11, 2026.
 
@@ -407,49 +413,49 @@ AI was used to do research on the Israeli inflation crisis, find sources for cla
 
 [^boi-1979]: Bank of Israel, *Annual Report 1979* (Jerusalem: Bank of Israel, 1980), chap. 10, 179, <https://boi.org.il/media/odwlzrjf/pe_10.pdf>.
 
-[^brookings]: Dany Bahar, "How Shimon Peres Saved the Israeli Economy," Brookings Institution, <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
-
-[^bruno-disinflation]: Bruno, "Generating a Sharp Disinflation," abstract, sections 2.3 and 3, and table 5.
+[^brookings]: Dany Bahar, "How Shimon Peres Saved the Israeli Economy," Brookings Institution, accessed November 11, 2026, <https://www.brookings.edu/articles/how-shimon-peres-saved-the-israeli-economy/>.
 
 [^bruno-intro]: Michael Bruno, "Generating a Sharp Disinflation: Israel 1985," NBER Working Paper 1822 (Cambridge, MA: National Bureau of Economic Research, 1986), abstract and introduction, <https://www.nber.org/system/files/working_papers/w1822/w1822.pdf>.
 
-[^bruno-steps]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+[^bruno-steps]: Bruno, "Generating a Sharp Disinflation," sec. 1.1, 5.
 
-[^bruno-index]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+[^bruno-index]: Bruno, "Generating a Sharp Disinflation," sec. 1.1, 7.
 
 [^friedman]: Milton Friedman, "The Counter-Revolution in Monetary Theory," in *Explorations in Economic Liberalism: The Wincott Lectures*, ed. Geoffrey E. Wood (London: Palgrave Macmillan, 1996), 18, <https://doi.org/10.1007/978-1-349-24967-1_1>.
 
-[^bruno-deficit]: Bruno, "Generating a Sharp Disinflation," sec. 1.1 and table 2. Table 2 reports the deficit including interest as 13, 8, 9, 9, 14, 9, 9, and 15 percent of GDP for 1977–84. See also note d to Table 2 on the inflation correction of public lending (about 5–8 percent of GDP in 1978–82 and 1–2 percent in 1983–84), which is not included in these figures.
+[^bruno-deficit]: Bruno, "Generating a Sharp Disinflation," sec. 1.1, 6; table 2, 36. Table 2 reports the deficit including interest as 13, 8, 9, 9, 14, 9, 9, and 15 percent of GDP for 1977–84. See also note d to table 2 on the inflation correction of public lending (about 5–8 percent of GDP in 1978–82 and 1–2 percent in 1983–84), which is not included in these figures.
 
-[^fischer-slowdown]: Stanley Fischer, "The Economy of Israel," NBER Working Paper 1190 (1983), 2; Frenkel, "Israel's Economic Crisis" (on military spending).
+[^fischer-slowdown]: Stanley Fischer, "The Economy of Israel," NBER Working Paper 1190 (Cambridge, MA: National Bureau of Economic Research, 1983), 2, <https://www.nber.org/papers/w1190>; Shlomo Frenkel, "Israel's Economic Crisis," *MERIP Reports* 136–137 (October 1985), <https://www.merip.org/1985/10/israels-economic-crisis/>.
 
-[^bruno-decade]: Bruno, "Generating a Sharp Disinflation," sec. 1.
+[^fischer-1983]: Fischer, "The Economy of Israel," 29–32.
 
-[^bruno-debt]: Bruno, "Generating a Sharp Disinflation," secs. 1 and 1.1.
+[^merip-planning]: Frenkel, "Israel's Economic Crisis."
 
-[^bruno-wages]: Bruno, "Generating a Sharp Disinflation," sec. 3 and table 5.
+[^banks]: Asher A. Blass and Richard S. Grossman, "Financial Fraud and Banking Stability: The Israeli Bank Crisis of 1983 and Trial of 1990," *International Review of Law and Economics* 16 (1996): 461–72, abstract; Natalie Leonard, "Israeli Bank Shares Arrangement," SSRN Electronic Journal, SSRN ID: 3981062, abstract, <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3981062>.
 
-[^fischer-1983]: Stanley Fischer, "The Economy of Israel," NBER Working Paper 1190 (Cambridge, MA: National Bureau of Economic Research, 1983), 29–32, <https://www.nber.org/papers/w1190>.
+[^ssrn-paper]: Leonard, "Israeli Bank Shares Arrangement," abstract.
 
-[^banks]: Asher A. Blass and Richard S. Grossman, "Financial Fraud and Banking Stability: The Israeli Bank Crisis of 1983 and Trial of 1990," *International Review of Law and Economics* 16 (1996): 461–72; Natalie Leonard, "Israeli Bank Shares Arrangement," SSRN Electronic Journal, SSRN ID: 3981062.
+[^bahar-growth]: Bahar, "How Shimon Peres Saved the Israeli Economy."
 
-[^bruno-liquid]: Bruno, "Generating a Sharp Disinflation," sec. 1.1.
+[^bruno-decade]: Bruno, "Generating a Sharp Disinflation," sec. 1, 2.
 
-[^ssrn-paper]: Natalie Leonard, "Israeli Bank Shares Arrangement," SSRN Electronic Journal, SSRN ID: 3981062, <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3981062>.
+[^bruno-debt]: Bruno, "Generating a Sharp Disinflation," sec. 1.1, 9.
 
-[^wdi-reserves]: World Bank, World Development Indicators, "Total reserves minus gold (current US$)," series FI.RES.XGLD.CD, <https://data.worldbank.org/indicator/FI.RES.XGLD.CD>.
+[^bruno-wages]: Bruno, "Generating a Sharp Disinflation," sec. 3, 29; table 5, 40.
 
-[^bruno-capital]: Bruno, "Generating a Sharp Disinflation," sec. 1 and fig. 3.
+[^bruno-liquid]: Bruno, "Generating a Sharp Disinflation," sec. 1.1, 7.
 
-[^latam]: Federal Reserve History, "Latin American Debt Crisis of the 1980s," <https://www.federalreservehistory.org/essays/latin-american-debt-crisis>.
+[^wdi-reserves]: World Bank, World Development Indicators, "Total reserves minus gold (current US$)," series FI.RES.XGLD.CD, accessed November 11, 2026, <https://data.worldbank.org/indicator/FI.RES.XGLD.CD>.
 
-[^interest-bruno]: Bruno, "Generating a Sharp Disinflation," sec. 3.1.
+[^bruno-capital]: Bruno, "Generating a Sharp Disinflation," sec. 1, 4; fig. 3, 43.
+
+[^latam]: Federal Reserve History, "Latin American Debt Crisis of the 1980s," accessed November 16, 2026, <https://www.federalreservehistory.org/essays/latin-american-debt-crisis>.
+
+[^interest-bruno]: Bruno, "Generating a Sharp Disinflation," sec. 3, 28.
 
 [^boi-1985]: Bank of Israel, *Annual Report 1985* (Jerusalem: Bank of Israel, 1986), chap. 8, 120, 133, <https://www.boi.org.il/media/fecp5es5/pe_8.pdf>.
 
 [^pwt]: Robert C. Feenstra, Robert Inklaar, and Marcel P. Timmer, "The Next Generation of the Penn World Table," *American Economic Review* 105, no. 10 (2015): 3150–82, accessed via FRED series RGDPNAILA666NRUG.
-
-[^merip-planning]: Frenkel, "Israel's Economic Crisis," *MERIP Reports* 136–137 (October 1985), <https://www.merip.org/1985/10/israels-economic-crisis/>.
 
 [^merip-onehalf]: Frenkel, "Israel's Economic Crisis."
 
@@ -457,26 +463,34 @@ AI was used to do research on the Israeli inflation crisis, find sources for cla
 
 [^package-outcome]: Bank of Israel, *Annual Report 1985*, chap. 8, 128, 133; Leonardo Leiderman and Assaf Razin, "Propagation of Shocks in a High-Inflation Economy: Israel, 1980–85," NBER Working Paper 2003 (Cambridge, MA: National Bureau of Economic Research, 1986), 4, <https://www.nber.org/papers/w2003>.
 
-[^bruno-plan]: Bruno, "Generating a Sharp Disinflation," secs. 2.1–2.2.
+[^bruno-plan]: Bruno, "Generating a Sharp Disinflation," abstract.
 
-[^bruno-wage]: Bruno, "Generating a Sharp Disinflation," sec. 2.4.
+[^bruno-wage]: Bruno, "Generating a Sharp Disinflation," sec. 2.4, 21.
 
 [^crs-aid]: Congressional Research Service, *U.S. Foreign Aid to Israel*, report prepared for Members and Committees of Congress, RL33222 (Washington, DC: Library of Congress), <https://www.everycrsreport.com/files/20070425_RL33222_ee97f8a100b2abd96b43a0f4d0cc6848e74efb26.pdf>.
 
-[^bruno-fx]: Bruno, "Generating a Sharp Disinflation," secs. 2.2–2.3.
+[^bruno-fx]: Bruno, "Generating a Sharp Disinflation," sec. 2.3, 20.
 
-[^bruno-cost]: Bruno, "Generating a Sharp Disinflation," abstract, sec. 3, and table 5.
+[^bruno-cost]: Bruno, "Generating a Sharp Disinflation," abstract; sec. 4, 32; table 5, 40.
 
-[^bruno-open]: Bruno, "Generating a Sharp Disinflation," secs. 2.1 and 4.
-
-[^bahar-growth]: Dany Bahar, "How Shimon Peres Saved the Israeli Economy," Brookings Institution.
+[^bruno-open]: Bruno, "Generating a Sharp Disinflation," sec. 3, 26.
 
 [^immigration]: Zvi Eckstein and Yoram Weiss, "On the Wage Growth of Immigrants: Israel, 1990–2000," *Journal of the European Economic Association* 2, no. 4 (2004): 665–95.
 
-[^bruno-politics]: Bruno, "Generating a Sharp Disinflation," secs. 2.1 and 4; Bahar, "How Shimon Peres Saved the Israeli Economy."
+[^bruno-politics]: Bahar, "How Shimon Peres Saved the Israeli Economy."
 
 [^debt-boi]: Trading Economics, "Israel Government Debt to GDP," accessed November 8, 2026, <https://tradingeconomics.com/israel/government-debt-to-gdp>, citing Bank of Israel data.
 
-[^bruno-twotwopointfive]: Bruno, "Generating a Sharp Disinflation," 16.
+[^bruno-twotwopointfive]: Bruno, "Generating a Sharp Disinflation," sec. 2.1, 16.
+
+[^bruno-p18]: Bruno, "Generating a Sharp Disinflation," sec. 2.2, 18.
 
 [^monthly-boi]: Bank of Israel, *Annual Report 1985* (Jerusalem: Bank of Israel, 1986), chap. 3, 36, <https://boi.org.il/media/zi1injbo/pe_3.pdf>.
+
+[^udo-agbai]: Okey Okoro Udo and Edward Perekebina Agbai, "The Impact of Currency Redenomination on Economic Development," *Journal of Accounting and Financial Management* 9, no. 10 (2023): sec. 6.2.1, 128, <https://doi.org/10.56201/jafm.v9.no10.2023.pg114.132>.
+
+[^bruno-p14]: Bruno, "Generating a Sharp Disinflation," sec. 2, 14.
+
+[^bruno-cutpublic]: Bruno, "Generating a Sharp Disinflation," sec. 2.1, 16.
+
+[^imf-1990]: International Monetary Fund, "The Role of Monetary Policy in Israel's 1985 Stabilization Effort," IMF Working Paper WP/90/29 (Washington, DC: International Monetary Fund, 1990), 1, <https://www.elibrary.imf.org/view/journals/001/1990/029/article-A001-en.xml>.
